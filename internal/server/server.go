@@ -23,7 +23,11 @@ func New(repository *repository.OrderRepository) *Server {
 func (s *Server) Start() error {
 	// Настройка маршрутов
 	router := http.NewServeMux()
-	router.HandleFunc("/order/", s.getOrderHandler) // Обработчик для заказов
+
+	router.Handle("/", http.FileServer(http.Dir("./web")))
+
+	// Обработчик API-запросов
+	router.HandleFunc("/order/", s.getOrderHandler)
 
 	// Конфигурация HTTP сервера
 	s.httpServer = &http.Server{

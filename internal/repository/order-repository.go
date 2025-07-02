@@ -165,11 +165,10 @@ func (r *OrderRepository) Get(orderUID string) (*models.Order, error) {
 
 	// Если нет в кэше, ищем в БД
 	order, err = r.getFromDB(orderUID)
-	if err == nil {
+	if order != nil {
 		log.Printf("Order found in DB (ID: %s)", order.OrderUID)
+		r.saveToCache(*order)
 	}
-
-	r.saveToCache(*order)
 
 	return order, err
 }

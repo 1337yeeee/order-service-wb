@@ -10,5 +10,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /order-service ./cmd/server
 FROM alpine:3.18
 WORKDIR /app
 COPY --from=builder /order-service .
+COPY --from=builder /app/web ./web
 EXPOSE 8080
 CMD ["./order-service"]
