@@ -5,14 +5,19 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/1337yeeee/order-service-wb/internal/cache"
 )
 
 type Server struct {
 	httpServer *http.Server
+	cache      *cache.Cache
 }
 
-func New() *Server {
-	return &Server{}
+func New(cache *cache.Cache) *Server {
+	return &Server{
+		cache: cache,
+	}
 }
 
 func (s *Server) Start() error {

@@ -1,5 +1,5 @@
-create table orders (
-    order_uid varchar primary key,
+create table if not exists orders (
+    order_uid uuid primary key,
     track_number varchar,
     entry varchar,
     locale varchar,
@@ -12,8 +12,8 @@ create table orders (
     oof_shard varchar
 );
 
-create table deliveries (
-    order_uid varchar references orders(order_uid),
+create table if not exists deliveries (
+    order_uid uuid references orders(order_uid),
     name varchar,
     phone varchar,
     zip varchar,
@@ -21,11 +21,11 @@ create table deliveries (
     address varchar,
     region varchar,
     email varchar,
-    primary key order_uid
+    primary key (order_uid)
 );
 
-create table payments (
-    order_uid varchar references orders(order_uid),
+create table if not exists payments (
+    order_uid uuid references orders(order_uid),
     transaction varchar,
     request_id varchar,
     currency varchar,
@@ -36,11 +36,11 @@ create table payments (
     delivery_cost float,
     goods_total float,
     custom_fee float,
-    primary key order_uid
+    primary key (order_uid)
 );
 
-create table items (
-    order_uid varchar references orders(order_uid),
+create table if not exists items (
+    order_uid uuid references orders(order_uid),
     chrt_id integer,
     track_number varchar,
     price float,

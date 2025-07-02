@@ -1,27 +1,30 @@
 package server
 
 import (
-	"encoding/json"
+	"log"
 	"net/http"
 )
 
 func (s *Server) getOrderHandler(w http.ResponseWriter, r *http.Request) {
-	// Пока заглушка - будем возвращать тестовые данные
-	orderID := r.URL.Path[len("/order/"):] // Извлекаем ID из URL
+	const testKey = "test_order"
 
-	if orderID == "" {
-		http.Error(w, "Order ID is required", http.StatusBadRequest)
+	// Логирование запроса
+	log.Printf("Request received for order: %s", r.URL.Path)
+
+	// Пытаемся получить данные из кэша
+	data, ok := s.cache.Get(testKey)
+	if !ok {
+		http.Error(w, "No data in cache", http.StatusNotFound)
+		log.Printf("No data found in cache for key: %s", testKey)
 		return
 	}
 
-	// TODO: Заменить на реальные данные из кэша/БД
-	testOrder := map[string]interface{}{
-		"id":      orderID,
-		"status":  "processed",
-		"message": "This is a test response. Real implementation will come later!",
-		"warning": "Kafka and database integration is not implemented yet",
-	}
+	// Логирование успешного ответа
+	log.Printf("Serving data from cache for key: %s", testKey)
 
+	// Устанавливаем заголовки и отправляем ответ
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(testOrder)
+	if _, err := w.Write(data); err != nil {
+		log.Printf("Failed to write response: %v", err)
+	}
 }
