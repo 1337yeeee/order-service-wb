@@ -6,17 +6,17 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/1337yeeee/order-service-wb/internal/cache"
+	"github.com/1337yeeee/order-service-wb/internal/repository"
 )
 
 type Server struct {
 	httpServer *http.Server
-	cache      *cache.Cache
+	repository *repository.OrderRepository
 }
 
-func New(cache *cache.Cache) *Server {
+func New(repository *repository.OrderRepository) *Server {
 	return &Server{
-		cache: cache,
+		repository: repository,
 	}
 }
 

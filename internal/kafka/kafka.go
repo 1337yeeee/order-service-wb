@@ -2,19 +2,21 @@ package kafka
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 
-	"github.com/1337yeeee/order-service-wb/internal/cache"
+	"github.com/1337yeeee/order-service-wb/internal/models"
+	"github.com/1337yeeee/order-service-wb/internal/repository"
 
 	"github.com/segmentio/kafka-go"
 )
 
 type Consumer struct {
-	reader *kafka.Reader
-	cache  *cache.Cache
+	reader     *kafka.Reader
+	repository *repository.OrderRepository
 }
 
-func New(brokers []string, topic string, groupID string, cache *cache.Cache) (*Consumer, error) {
+func New(brokers []string, topic string, groupID string, repository *repository.OrderRepository) (*Consumer, error) {
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  brokers,
 		GroupID:  groupID,
@@ -24,8 +26,8 @@ func New(brokers []string, topic string, groupID string, cache *cache.Cache) (*C
 	})
 
 	return &Consumer{
-		reader: reader,
-		cache:  cache,
+		reader:     reader,
+		repository: repository,
 	}, nil
 }
 
@@ -35,18 +37,25 @@ func (c *Consumer) Start(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		default:
+			// Получае сообщение из Kafka
 			msg, err := c.reader.ReadMessage(ctx)
 			if err != nil {
 				log.Printf("Kafka consumer error: %v", err)
 				continue
 			}
 
-			const testKey = "test_order"
-			c.cache.Set(testKey, msg.Value)
-			log.Printf(
-				"Message stored in cache (topic=%s partition=%d offset=%d)",
-				msg.Topic, msg.Partition, msg.Offset,
-			)
+			// Десериализируем сообщение в модель заказа
+			var order models.Order
+			if err := json.Unmarshal(msg.Value, &order); err != nil {
+				log.Printf("Failed to unmarshal order: %v", err)
+				continue
+			}
+
+			// Сохраняем заказ через репозиторий
+			if err := c.repository.Save(order); err != nil {
+				log.Printf("Failed to save order to DB: %v", err)
+				continue
+			}
 		}
 	}
 }

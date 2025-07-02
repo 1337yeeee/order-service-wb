@@ -1,3 +1,5 @@
+BEGIN;
+
 create table if not exists orders (
     order_uid uuid primary key,
     track_number varchar,
@@ -53,3 +55,5 @@ create table if not exists items (
     brand varchar,
     status integer
 );
+
+COMMIT;
