@@ -23,6 +23,10 @@ func New(cache *cache.Cache, db *sql.DB) *OrderRepository {
 }
 
 func (r *OrderRepository) Save(order models.Order) error {
+	if err := models.ValidateOrder(order); err != nil {
+		return fmt.Errorf("validation failed: %w", err)
+	}
+
 	// Сохраняем заказ в кэш
 	if err := r.saveToCache(order); err != nil {
 		return err

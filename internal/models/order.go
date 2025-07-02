@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -56,4 +57,34 @@ type Item struct {
 	NmID        int     `json:"nm_id"`
 	Brand       string  `json:"brand"`
 	Status      int     `json:"status"`
+}
+
+func ValidateOrder(order Order) error {
+	if order.OrderUID == "" {
+		return fmt.Errorf("order_uid is required")
+	}
+	if order.TrackNumber == "" {
+		return fmt.Errorf("track_number is required")
+	}
+	if order.Entry == "" {
+		return fmt.Errorf("entry is required")
+	}
+	if order.CustomerID == "" {
+		return fmt.Errorf("customer_id is required")
+	}
+	if order.Delivery.Name == "" || order.Delivery.Phone == "" {
+		return fmt.Errorf("delivery name and phone are required")
+	}
+	if order.Payment.Transaction == "" || order.Payment.Amount <= 0 {
+		return fmt.Errorf("payment transaction and amount are required and must be > 0")
+	}
+	if len(order.Items) == 0 {
+		return fmt.Errorf("at least one item is required")
+	}
+	for i, item := range order.Items {
+		if item.Rid == "" || item.Name == "" {
+			return fmt.Errorf("item[%d] missing required fields", i)
+		}
+	}
+	return nil
 }

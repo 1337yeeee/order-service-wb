@@ -53,7 +53,7 @@ func (c *Consumer) Start(ctx context.Context) {
 
 			// Сохраняем заказ через репозиторий
 			if err := c.repository.Save(order); err != nil {
-				log.Printf("Failed to save order to DB: %v", err)
+				log.Printf("Failed to save order: %v", err)
 				continue
 			}
 		}
