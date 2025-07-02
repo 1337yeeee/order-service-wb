@@ -1,7 +1,7 @@
 BEGIN;
 
 create table if not exists orders (
-    order_uid uuid primary key,
+    order_uid varchar primary key,
     track_number varchar,
     entry varchar,
     locale varchar,
@@ -15,7 +15,7 @@ create table if not exists orders (
 );
 
 create table if not exists deliveries (
-    order_uid uuid references orders(order_uid),
+    order_uid varchar references orders(order_uid),
     name varchar,
     phone varchar,
     zip varchar,
@@ -27,7 +27,7 @@ create table if not exists deliveries (
 );
 
 create table if not exists payments (
-    order_uid uuid references orders(order_uid),
+    order_uid varchar references orders(order_uid),
     transaction varchar,
     request_id varchar,
     currency varchar,
@@ -42,7 +42,7 @@ create table if not exists payments (
 );
 
 create table if not exists items (
-    order_uid uuid references orders(order_uid),
+    order_uid varchar references orders(order_uid),
     chrt_id integer,
     track_number varchar,
     price float,
